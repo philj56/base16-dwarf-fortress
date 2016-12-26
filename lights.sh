@@ -1,21 +1,17 @@
 #!/bin/bash
 
 function alt_colour {
-        difference_r=$(echo "255-$1" | bc)
-        difference_g=$(echo "255-$2" | bc)
-        difference_b=$(echo "255-$3" | bc)
-        value=$(echo -e "$difference_r\n$difference_g\n$difference_b" | sort -n | tail -n1)
-        new_r=$(echo "$difference_r*(255-$value)/$value" | bc)
-        new_g=$(echo "$difference_g*(255-$value)/$value" | bc)
-        new_b=$(echo "$difference_b*(255-$value)/$value" | bc)
+        value=$(echo -e "$1\n$2\n$3" | sort -n | tail -n1)
 
         if [ "$4" = "1" ]; then
-                echo "$1 - $new_r" | bc
+                colour=$1
         elif [ "$4" = "2" ]; then
-                echo "$2 - $new_g" | bc
+                colour=$2
         else
-                echo "$3 - $new_b" | bc
+                colour=$3
         fi
+
+        printf "%.0f\n" $(echo "$colour * 255 / $value" | bc -l)
 }
 
 function get_colour {
@@ -47,6 +43,7 @@ l_lines[13]=43
 l_lines[14]=44 
 
 for file in colors/*.txt; do
+        echo -n "$file... "
         dos2unix -q $file
         mapfile -t lines < $file
         for i in 0 1 2 3 4; do
@@ -72,5 +69,5 @@ for file in colors/*.txt; do
                 sed -i "s/$old_g_line/$new_g_line/g" $file
                 sed -i "s/$old_b_line/$new_b_line/g" $file
         done
-        echo "Done $file"
+        echo "done."
 done
